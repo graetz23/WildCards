@@ -19,7 +19,7 @@ Mono and MonoDevelop by debian GNU/Linux is and was used for implementation.
 I used this project to get from C++ into C# and also into mono and MonoDevelop.
 
 ## Contact
-Christian Dannenmann (graetz23@gmail.com).
+Christian (graetz23@gmail.com).
 
 ## Changelog
 ### 20200301
