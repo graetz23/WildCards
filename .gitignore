@@ -3,3 +3,4 @@ obj/*
 test-results/*
 *.sln
 *.userprefs
+.vs/
