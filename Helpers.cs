@@ -24,14 +24,14 @@ using System;
 
 namespace WildCards
 {
-  /// <summary>
-  /// Static class and methods for helping out by minor functionality.
-  /// </summary>
-  public static class Helper
-  {
+    /// <summary>
+    /// Static class and methods for helping out by minor functionality.
+    /// </summary>
+    public static class Helper
+    {
 
-    // TODO implement static methods only
+        
 
-  } // class
+    } // class
 
 } // namespace

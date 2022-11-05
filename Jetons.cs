@@ -23,10 +23,15 @@
 
 namespace WildCards
 {
-    namespace Types
+    namespace Jetons
     {
+        /// <summary>
+        /// A jeton of true plastic value.
+        /// </summary>
+        public class Jeton
+        {
 
-        //
+        } // class
 
     } // namespace
 } // namespace
