@@ -16,11 +16,14 @@ The project supplies oneself as a *look-up* or a *how-to do it* in C# summary.
 Mono and MonoDevelop by debian GNU/Linux is and was used for implementation.
 
 ## Remarks
-I used this project to get from C++ into C# and also into mono and MonoDevelop.
+I used this project in 2018 to get from C++ into C# and also into mono and MonoDevelop.
 
 ## Contact
 Christian (graetz23@gmail.com).
 
 ## Changelog
+### 20221105
+Updating copyright and refactoring project.
+
 ### 20200301
 Refactoring the projects new github account.
