@@ -129,7 +129,7 @@ namespace WildCards
                 public Idling(string name = Tags.Idling) : base(name) { }
                 public override State next(string name = Tags.Shuffling)
                 {
-                    return base.next(name); // not Tags.Idling
+                    return base.next(name); // not Tags.Idling which is first, instead Tags.Shuffling
                 } // method
             } // class
             internal class Shuffling : State { public Shuffling(string name = Tags.Shuffling) : base(name) { } } // class

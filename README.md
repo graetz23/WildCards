@@ -1,5 +1,5 @@
 # WildCards
-A playing card simulator / library and playground for software design pattern; written in C#.
+A playing card simulator / library and a playground for object-oriented programming using software design pattern; all written in C#.
 
 ## Purpose
 ### Simulator
@@ -22,6 +22,10 @@ I used this project in 2018 to get from C++ into C# and also into mono and MonoD
 Christian (graetz23@gmail.com).
 
 ## Changelog
+### 20221106
+Adding Helper methods for MD5, pseudo UUID v5, and non-case sensitive compares.
+Adding classes Staple and Bank for handling Jetons.
+
 ### 20221105
 Updating copyright and refactoring project.
 Refactoring code in several cases.

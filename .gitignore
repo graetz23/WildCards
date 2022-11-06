@@ -1,6 +1,6 @@
-bin/*
-obj/*
-test-results/*
+bin/
+obj/
+run/
 *.sln
 *.userprefs
 .vs/

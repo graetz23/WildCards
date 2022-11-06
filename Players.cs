@@ -29,20 +29,25 @@ namespace WildCards
     namespace Persons
     {
         using Cards;
+        using Rules;
         using Tables;
+        using Jetons;
         using Exceptions;
-        using WildCards.Rules;
+        using System.Collections.Generic;
 
         public class Player
         {
             protected StateMachine _stateMachine = null;
 
-            protected Stack _hand = null;
+            protected Staple _staple = null; // for Jeton objects
 
-            protected Table _table = null;
+            protected Stack _hand = null; // for Card objects
+
+            protected Table _table = null; // for commanding StateMachine and playing Cards
 
             public Player(int maxNoOfCards)
             {
+                _staple = new Staple();
                 if (maxNoOfCards < 1)
                     throw new NotValid(GetType() + " - given maximum number of Cards is smaller than 1!");
                 _hand = new Stack(maxNoOfCards);

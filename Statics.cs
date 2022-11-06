@@ -27,6 +27,8 @@ namespace WildCards
 {
     public static class Statics
     {
+        public static int Min = -2147483648; // try -2147483649 ~8>
+        public static int Max = 2147483647; // try 2147483648 ~8>
         public static long Ticks = DateTime.Now.Ticks; // Ticks = 638032782766813878
         public static int Seed = (int)Ticks; // Seed = 2078192310
         public static Random Random = new Random(Seed); // random number generator of this run

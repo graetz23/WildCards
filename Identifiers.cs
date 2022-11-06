@@ -25,10 +25,12 @@ namespace WildCards
 {
     public static class Tags
     {
+        // Colors
         public static string Spade { get { return "Spade"; } }
         public static string Cross { get { return "Cross"; } }
         public static string Heart { get { return "Heart"; } }
         public static string Diamond { get { return "Diamond"; } }
+        // Cards and some for Jetons: One, Five, and Ten.
         public static string Ace { get { return "Ace"; } }
         public static string King { get { return "King"; } }
         public static string Queen { get { return "Queen"; } }
@@ -44,12 +46,18 @@ namespace WildCards
         public static string Two { get { return "Two"; } }
         public static string One { get { return "One"; } }
         public static string Joker { get { return "Joker"; } }
+        // Jetons
+        public static string Twenty { get { return "Twenty"; } }
+        public static string Fifty { get { return "Fifty"; } }
+        public static string Hundred { get { return "Hundred"; } }
+        public static string Thousand { get { return "Thousand"; } }
 
         public static string shorten(string tag)
         {
             string id = null;
             switch (tag.ToLower())
             {
+                // Colors
                 case "spade":
                     id = "S";
                     break;
@@ -62,6 +70,7 @@ namespace WildCards
                 case "diamond":
                     id = "D";
                     break;
+                // Cards and some for Jetons: One, Five, and Ten.
                 case "ace":
                     id = "A";
                     break;
@@ -107,6 +116,19 @@ namespace WildCards
                 case "joker":
                     id = "0";
                     break;
+                // Jetons only
+                case "twenty":
+                    id = "20";
+                    break;
+                case "fifty":
+                    id = "50";
+                    break;
+                case "hundred":
+                    id = "100";
+                    break;
+                case "thousand":
+                    id = "1000";
+                    break;
             } // switch
             return id;
         } // method
@@ -116,6 +138,7 @@ namespace WildCards
             int val = -1; // invalid
             switch (tag.ToLower())
             {
+                // Colors
                 case "spade":
                     val = 400;
                     break;
@@ -140,6 +163,7 @@ namespace WildCards
                 case "d":
                     val = 100;
                     break;
+                // Cards and some for Jetons: One, Five, and Ten.
                 case "ace":
                     val = 50;
                     break;
@@ -229,6 +253,31 @@ namespace WildCards
                     break;
                 case "0":
                     val = 0;
+                    break;
+                // Jetons only
+                case "twenty":
+                    val = 20;
+                    break;
+                case "20":
+                    val = 20;
+                    break;
+                case "fifty":
+                    val = 50;
+                    break;
+                case "50":
+                    val = 50;
+                    break;
+                case "hundred":
+                    val = 100;
+                    break;
+                case "100":
+                    val = 100;
+                    break;
+                case "thousand":
+                    val = 1000;
+                    break;
+                case "1000":
+                    val = 1000;
                     break;
             } // switch
             return val;
