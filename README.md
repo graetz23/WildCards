@@ -27,14 +27,17 @@ Adding Helper methods for MD5, pseudo UUID v5, and non-case sensitive compares.
 Adding classes Staple and Bank for handling Jetons.
 
 ### 20221105
-Updating copyright and refactoring project.
-Refactoring code in several cases.
-Adding class Statics for random number with seeding.
-Adding class Tags for static names, shorts, and values.
-Adding classes for a state machine and texas hold em poker.
-Adding namespace Jetons and base class Jeton.
-Adding the shuffling behaviour 'Stacked'.
-Fixing the random shuffler bug.
+  - Updating copyright and refactoring project.
+  - Refactoring code in several cases.
+  - Adding class Statics for random number with seeding.
+  - Adding class Tags for static names, shorts, and values.
+  - Adding classes for a state machine and texas hold em poker.
+  - Adding namespace Jetons and base class Jeton.
+  - Adding a Bank object that exchange dollars to Jeton objects.
+    - The bank object can balance its spent Jetons against its account.
+    - The bank object can check Jetons for their registration.
+  - Adding the shuffling behaviour 'Stacked'.
+  - Fixing the random shuffler bug.
 
 ### 20200301
-Refactoring the project's new github account.
+  - Refactoring the project's new github account.

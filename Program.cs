@@ -31,6 +31,7 @@ namespace WildCards
     using Cards.French;
     using Cards.Values;
     using Behaviours = List<Cards.Shuffling.Behaviour>;
+    using WildCards.Currency;
 
     class MainClass
     {
@@ -88,11 +89,9 @@ namespace WildCards
                 bank.hasIntegrity();
                 Console.WriteLine();
 
-                Helper.explode(9999);
-                Helper.explode(234207);
-                Helper.explode(9999);
-                Helper.explode(234207);
-
+                List<Currency.Jeton> jetons = bank.change(9999);
+                bool areRegisterd = bank.registered(jetons);
+                int dollar = bank.change(jetons);
             }
             catch (Exception e)
             {

@@ -25,6 +25,9 @@ namespace WildCards
 {
     public static class Tags
     {
+        // Current used
+        public static string[] UsedTags = { Tags.Thousand, Tags.Hundred, Tags.Fifty, Tags.Ten, Tags.Five, Tags.One };
+
         // Colors
         public const string cnst_Spade = "Spade";
         public static string Spade { get { return cnst_Spade; } }

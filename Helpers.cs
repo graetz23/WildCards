@@ -83,6 +83,27 @@ namespace WildCards
             return Guid.NewGuid().ToString();
         } // method
 
+        public static Dictionary<string, int> explode(int number)
+        {
+            int steps = Tags.UsedTags.Length;
+            Dictionary<string, int> set = new Dictionary<string, int>();
+            int step = 0;
+            while (step < steps && number != 0)
+            {
+                string tag = Tags.UsedTags[step];
+                int divider = Tags.value(tag);
+                int rest = number % divider;
+                int times = (number - rest) / divider;
+                set.Add(tag, times);
+                number = rest;
+                step++;
+            } // loop
+            return set;
+        } // method
+
+
+
+
         public static Dictionary<string, int> explode_handed(int number)
         {
             Dictionary<string, int> set = new Dictionary<string, int>();
@@ -117,25 +138,6 @@ namespace WildCards
             set.Add(Tags.One, oneTimes);
             number = number - rest1; // 0
 
-            return set;
-        } // method
-
-        public static Dictionary<string, int> explode(int number)
-        {
-            string[] arr = { Tags.Thousand, Tags.Hundred, Tags.Fifty, Tags.Ten, Tags.Five, Tags.One };
-            int steps = arr.Length;
-            Dictionary<string, int> set = new Dictionary<string, int>();
-            int step = 0;
-            while (step < steps && number != 0)
-            {
-                string tag = arr[step];
-                int divider = Tags.value(tag);
-                int rest = number % divider;
-                int times = (number - rest) / divider;
-                set.Add(tag, times);
-                number = rest;
-                step++;
-            } // loop
             return set;
         } // method
 

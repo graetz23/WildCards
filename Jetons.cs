@@ -25,10 +25,14 @@ namespace WildCards
 {
     namespace Currency
     {
+        using Microsoft.Win32.SafeHandles;
+        using System.CodeDom;
+        using System.Collections.Concurrent;
         using System.Collections.Generic;
         using WildCards.Exceptions;
         using Jetons = System.Collections.Generic.List<Jeton>;
         using JetonSet = System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<Jeton>>;
+        using Register = System.Collections.Generic.Dictionary<string, Jeton>;
 
         /// <summary>
         /// A jeton of true plastic value.
@@ -133,7 +137,81 @@ namespace WildCards
 
         } // class
 
-        // TODO implement JetonTen, JetonTwenty, JetonFifty, JetonHundred, JetonThousand
+        public class JetonTen : Jeton
+        {
+            public JetonTen() : base(Helper.genUUID())
+            {
+                _id = Tags.shorten(Tags.Ten);
+                _value = Tags.value(Tags.Ten);
+                _xTag = Tags.Ten;
+            } // method
+
+            public JetonTen(Jeton jeton) : base(jeton.UUID)
+            {
+                ID = jeton.ID;
+                VALUE = jeton.VALUE;
+                XTag = jeton.XTag;
+                verify(Tags.Ten);
+            } // method
+
+        } // class
+
+        public class JetonFifty : Jeton
+        {
+            public JetonFifty() : base(Helper.genUUID())
+            {
+                _id = Tags.shorten(Tags.Fifty);
+                _value = Tags.value(Tags.Fifty);
+                _xTag = Tags.Fifty;
+            } // method
+
+            public JetonFifty(Jeton jeton) : base(jeton.UUID)
+            {
+                ID = jeton.ID;
+                VALUE = jeton.VALUE;
+                XTag = jeton.XTag;
+                verify(Tags.Fifty);
+            } // method
+
+        } // class
+
+        public class JetonHundred : Jeton
+        {
+            public JetonHundred() : base(Helper.genUUID())
+            {
+                _id = Tags.shorten(Tags.Hundred);
+                _value = Tags.value(Tags.Hundred);
+                _xTag = Tags.Hundred;
+            } // method
+
+            public JetonHundred(Jeton jeton) : base(jeton.UUID)
+            {
+                ID = jeton.ID;
+                VALUE = jeton.VALUE;
+                XTag = jeton.XTag;
+                verify(Tags.Hundred);
+            } // method
+
+        } // class
+
+        public class JetonThousand : Jeton
+        {
+            public JetonThousand() : base(Helper.genUUID())
+            {
+                _id = Tags.shorten(Tags.Thousand);
+                _value = Tags.value(Tags.Thousand);
+                _xTag = Tags.Thousand;
+            } // method
+
+            public JetonThousand(Jeton jeton) : base(jeton.UUID)
+            {
+                ID = jeton.ID;
+                VALUE = jeton.VALUE;
+                XTag = jeton.XTag;
+                verify(Tags.Thousand);
+            } // method
+
+        } // class
 
         public class JetonFraud : Jeton
         { // this is a fake jeton that is nothing worth ..
@@ -180,14 +258,41 @@ namespace WildCards
                 {
                     SET[Tags.Five].Add(jeton);
                 }
-                //else if (jeton is JetonTen)
-                //{
-                //    STAPLE[Tags.Ten].Add(jeton);
-                //}
+                else if (jeton is JetonTen)
+                {
+                    SET[Tags.Ten].Add(jeton);
+                }
+                else if (jeton is JetonFifty)
+                {
+                    SET[Tags.Fifty].Add(jeton);
+                }
+                else if (jeton is JetonHundred)
+                {
+                    SET[Tags.Hundred].Add(jeton);
+                }
+                else if (jeton is JetonThousand)
+                {
+                    SET[Tags.Thousand].Add(jeton);
+                }
                 else
                 {
                     throw new NotValid($"{GetType()} - given Jeton is not valid: {jeton.GetType()}");
                 } // if
+            } // method
+
+            public Jeton remove(string tag)
+            {
+                Jeton jeton = null;
+                if (!SET.ContainsKey(tag))
+                    throw new NotValid($"{GetType()} - given tag: {tag} is not valid");
+                Jetons jetons = SET[tag];
+                int pos = jetons.Count - 1;
+                if (pos >= 0)
+                {
+                    jeton = jetons[pos];
+                    jetons.RemoveAt(pos);
+                } // if
+                return jeton;
             } // method
 
             public long sumUp()
@@ -207,19 +312,38 @@ namespace WildCards
 
 
         /// <summary>
-        /// Generates Jetons and keeps a digital copy of all generated Jeton objects.
+        /// Generates Jetons and keeps a registry of all generated Jeton objects.
+        /// The bank does balance all exchanges from currency to Jeton objects and
+        /// from Jeton objects to currency.
         /// </summary>
+        /// <remarks>
+        /// Acts like a combined memento pattern and factory pattern for Jeton obejcts.
+        /// </remarks>
         public class Bank
         {
-            private long _account = 0;
+            // The balancing of this bank
+            private long _weight = 0; // how rich we are
+            private long _account = 0; // the earns we have
+            private long _issued = 0; // the outstandings we request
+            public long WEIGHT { get { return _weight; } } // method
+            public long ACCOUNT { get { return _account; } } // method
+            public long ISSUED { get { return -_issued; } } // method
+            public long CURRENT { get { return WEIGHT - ISSUED; } } // method
+            public long BALANCE { get { return ACCOUNT - ISSUED; } } // method
+            public bool checkBalance { get { return BALANCE == 0; } }
+
+            // the registery of this bank 
+            private Register _register = null;
+            protected Register REGISTER { get { return _register; } private set { _register = value; } }
 
             private Set _safe = null;
             protected Set SAFE { get { return _safe; } private set { _safe = value; } }
 
-            public Bank()
+            public Bank(int noOfEach = 10000)
             {
                 SAFE = new Set();
-                generate(SAFE, 10000);
+                REGISTER = new Register(); ;
+                generate(SAFE, noOfEach);
             } // method
 
             private Jeton produce(string tag)
@@ -234,20 +358,25 @@ namespace WildCards
                         jeton = new JetonFive(); // fresh from the press a 5
                         break;
                     case Tags.cnst_Ten:
-                        jeton = new JetonFraud(); // TODO produce JetonTen object here
+                        jeton = new JetonTen(); // fresh from the press a 10
                         break;
                     case Tags.cnst_Fifty:
-                        jeton = new JetonFraud(); // TODO produce JetonFifty object here
+                        jeton = new JetonFifty(); // fresh from the press a 50
                         break;
                     case Tags.cnst_Hundred:
-                        jeton = new JetonFraud(); // TODO produce JetonHundred object here
+                        jeton = new JetonHundred(); // fresh from the press a 100
                         break;
                     case Tags.cnst_Thousand:
-                        jeton = new JetonFraud(); // TODO produce JetonThousand object here
+                        jeton = new JetonThousand(); // fresh from the press a 1000
                         break;
                     default:
                         throw new NotValid($"{GetType()} - given tag: {tag} is not valid for producing a Jeton object");
                 } // switch
+                if (!REGISTER.ContainsKey(jeton.UUID))
+                    REGISTER.Add(jeton.UUID, jeton);
+                else
+                    throw new NotValid($"{GetType()} - current jeton doubled an UUID: {jeton.UUID}");
+                _weight += jeton.VALUE; // add to the weight of this bank
                 return jeton;
             } // method
 
@@ -256,7 +385,7 @@ namespace WildCards
                 foreach (string tag in SAFE.SET.Keys)
                 {
                     Jetons jetons = SAFE.SET[tag];
-                    for( int j = 0; j < sum; j++)
+                    for (int j = 0; j < sum; j++)
                     {
                         Jeton jeton = produce(tag);
                         jetons.Add(jeton);
@@ -268,17 +397,19 @@ namespace WildCards
             {
                 bool hasIntegrity = true;
                 HashSet<string> uuids = new HashSet<string>();
-                foreach(string tag in SAFE.SET.Keys)
+                foreach (string tag in SAFE.SET.Keys)
                 {
-                    foreach(Jeton jeton in SAFE.SET[tag])
+                    foreach (Jeton jeton in SAFE.SET[tag])
                     {
                         string uuid = jeton.UUID;
-                        if (uuids.Contains(uuid)) {
+                        if (uuids.Contains(uuid))
+                        {
                             hasIntegrity = false;
 #if DEBUG                        
                             System.Console.WriteLine($"{GetType()} - found doubled UUID: {uuid}");
 #endif               
-                        } else
+                        }
+                        else
                         {
                             uuids.Add(uuid);
                         } // if
@@ -287,19 +418,65 @@ namespace WildCards
                 return hasIntegrity;
             } // method
 
+            public bool registered(Jeton jeton)
+            {
+                bool isRegistered = false;
+                string uuid = jeton.UUID;
+                if (REGISTER.ContainsKey(uuid))
+                {
+                    isRegistered = true;
+                } // if
+                return isRegistered;
+            } // method
+
+            public bool registered(Jetons jetons)
+            {
+                bool areRegistered = true;
+                foreach (Jeton jeton in jetons)
+                {
+                    bool isRegsitered = registered(jeton);
+                    if (!isRegsitered)
+                    {
+                        areRegistered = false;
+                    } // if
+                } // method
+                return areRegistered;
+            } // method
+
             public long sumUp() { return SAFE.sumUp(); }
 
             public Jetons change(int dollar)
             {
                 Jetons jetons = new Jetons();
                 // TODO implement the exchange of jetons by given amount of dollars
+                Dictionary<string, int> change = Helper.explode(dollar);
+                foreach (string tag in change.Keys)
+                {
+                    int noOfJetons = change[tag];
+                    for (int i = 0; i < noOfJetons; i++)
+                    {
+                        Jeton jeton = SAFE.remove(tag); // hand out this object
+                        _account += jeton.VALUE; // balancing
+                        _issued -= jeton.VALUE; // balancing
+                        jetons.Add(jeton); // unsorted
+                    } // loop
+                } // loop
                 return jetons;
             } // method
 
             public int change(Jetons jetons)
             {
                 int dollar = 0;
-                // TODO implement the exchange of dollar by given amount of jeton
+                foreach (Jeton jeton in jetons)
+                {
+                    string tag = jeton.XTag;
+                    int value = jeton.VALUE;
+                    _account -= value;
+                    _issued += value;
+                    dollar += value;
+                    SAFE.add(jeton);
+                } // loop
+                jetons.Clear(); // clear the list
                 return dollar;
             } // method
 
