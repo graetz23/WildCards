@@ -31,7 +31,7 @@ namespace WildCards
         using Cards;
         using Rules;
         using Tables;
-        using Jetons;
+        using Currency;
         using Exceptions;
         using System.Collections.Generic;
 
@@ -39,7 +39,7 @@ namespace WildCards
         {
             protected StateMachine _stateMachine = null;
 
-            protected Staple _staple = null; // for Jeton objects
+            protected Set _staple = null; // for Jeton objects
 
             protected Stack _hand = null; // for Card objects
 
@@ -47,7 +47,7 @@ namespace WildCards
 
             public Player(int maxNoOfCards)
             {
-                _staple = new Staple();
+                _staple = new Set();
                 if (maxNoOfCards < 1)
                     throw new NotValid(GetType() + " - given maximum number of Cards is smaller than 1!");
                 _hand = new Stack(maxNoOfCards);

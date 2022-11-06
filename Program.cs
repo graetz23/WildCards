@@ -79,6 +79,20 @@ namespace WildCards
 
                 Console.WriteLine();
 
+                Console.WriteLine();
+                Console.WriteLine("Jetons:");
+                Console.WriteLine();
+
+                Currency.Bank bank = new Currency.Bank();
+                Console.WriteLine($"The bank keeps: {bank.sumUp()}");
+                bank.hasIntegrity();
+                Console.WriteLine();
+
+                Helper.explode(9999);
+                Helper.explode(234207);
+                Helper.explode(9999);
+                Helper.explode(234207);
+
             }
             catch (Exception e)
             {

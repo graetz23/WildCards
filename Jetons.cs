@@ -23,10 +23,12 @@
 
 namespace WildCards
 {
-    namespace Jetons
+    namespace Currency
     {
         using System.Collections.Generic;
         using WildCards.Exceptions;
+        using Jetons = System.Collections.Generic.List<Jeton>;
+        using JetonSet = System.Collections.Generic.Dictionary<string, System.Collections.Generic.List<Jeton>>;
 
         /// <summary>
         /// A jeton of true plastic value.
@@ -56,10 +58,10 @@ namespace WildCards
             /// The integer value of the jeton.
             /// </summary>
             /// <remarks>
-            /// It used for calculations on worthness and playing strategy.
+            /// It's used for calculations on jeton worthness and on playing strategy.
             /// </remarks>
             protected int _value = 0;
-            public int VAL { get { return _value; } protected set { _value = value; } }
+            public int VALUE { get { return _value; } protected set { _value = value; } }
 
             /// <summary>
             /// A part of the unique XML tag of the object.
@@ -75,7 +77,7 @@ namespace WildCards
             protected void verify(string tag)
             { // jeton was loaded from file, check for manipulations
                 if (tag != null)
-                { 
+                {
                     if (!Helper.compare(XTag, tag))
                     {
                         throw new NotValid($"{GetType()} - given XTag: {XTag} is not {tag}");
@@ -84,9 +86,9 @@ namespace WildCards
                     {
                         throw new NotValid($"{GetType()} - given ID: {ID} is not {Tags.shorten(tag)}");
                     } // if
-                    if (VAL != Tags.value(tag))
+                    if (VALUE != Tags.value(tag))
                     {
-                        throw new NotValid($"{GetType()} - given VAL: {VAL} is not {Tags.value(tag)}");
+                        throw new NotValid($"{GetType()} - given VAL: {VALUE} is not {Tags.value(tag)}");
                     } // if
                 } // if
             } // method
@@ -105,40 +107,82 @@ namespace WildCards
             public JetonOne(Jeton jeton) : base(jeton.UUID)
             {
                 ID = jeton.ID;
-                VAL = jeton.VAL;
+                VALUE = jeton.VALUE;
                 XTag = jeton.XTag;
                 verify(Tags.One);
             } // method
 
         } // class
 
-        // TODO implement JetonFive, JetonTen, JetonFifty, JetonHundred, JetonThousand
-
-
-        public class Staple
+        public class JetonFive : Jeton
         {
-            protected Dictionary<string, List<Jeton>> _jetons = null;
-
-            public Staple()
+            public JetonFive() : base(Helper.genUUID())
             {
-                _jetons = new Dictionary<string, List<Jeton>>();
-                _jetons.Add(Tags.One, new List<Jeton>());
-                _jetons.Add(Tags.Five, new List<Jeton>());
-                _jetons.Add(Tags.Ten, new List<Jeton>());
-                _jetons.Add(Tags.Fifty, new List<Jeton>());
-                _jetons.Add(Tags.Hundred, new List<Jeton>());
-                _jetons.Add(Tags.Thousand, new List<Jeton>());
+                _id = Tags.shorten(Tags.Five);
+                _value = Tags.value(Tags.Five);
+                _xTag = Tags.Five;
+            } // method
+
+            public JetonFive(Jeton jeton) : base(jeton.UUID)
+            {
+                ID = jeton.ID;
+                VALUE = jeton.VALUE;
+                XTag = jeton.XTag;
+                verify(Tags.Five);
+            } // method
+
+        } // class
+
+        // TODO implement JetonTen, JetonTwenty, JetonFifty, JetonHundred, JetonThousand
+
+        public class JetonFraud : Jeton
+        { // this is a fake jeton that is nothing worth ..
+            public JetonFraud() : base(Helper.genUUID())
+            {
+                _id = Tags.shorten(Tags.Joker);
+                _value = Tags.value(Tags.Joker);
+                _xTag = Tags.Joker;
+            } // method
+
+            public JetonFraud(Jeton jeton) : base(jeton.UUID)
+            {
+                ID = jeton.ID;
+                VALUE = jeton.VALUE;
+                XTag = jeton.XTag;
+                verify(Tags.Joker);
+            } // method
+
+        } // class
+
+        public class Set
+        {
+            private JetonSet _jetonSet = null;
+            public JetonSet SET { get { return _jetonSet; } private set { _jetonSet = value; } }
+
+            public Set()
+            {
+                SET = new JetonSet();
+                SET.Add(Tags.One, new Jetons());
+                SET.Add(Tags.Five, new Jetons());
+                SET.Add(Tags.Ten, new Jetons());
+                SET.Add(Tags.Fifty, new Jetons());
+                SET.Add(Tags.Hundred, new Jetons());
+                SET.Add(Tags.Thousand, new Jetons());
             } // class
 
             public void add(Jeton jeton)
             {
-                if(jeton is JetonOne)
+                if (jeton is JetonOne)
                 {
-                    _jetons[Tags.One].Add(jeton);
+                    SET[Tags.One].Add(jeton);
                 }
-                //else if (jeton is JetonFive)
+                else if (jeton is JetonFive)
+                {
+                    SET[Tags.Five].Add(jeton);
+                }
+                //else if (jeton is JetonTen)
                 //{
-                //    _jetons[Tags.Five].Add(jeton);
+                //    STAPLE[Tags.Ten].Add(jeton);
                 //}
                 else
                 {
@@ -146,14 +190,14 @@ namespace WildCards
                 } // if
             } // method
 
-            public int sumUp()
+            public long sumUp()
             {
-                int sum = 0;
-                foreach(List<Jeton> staple in _jetons.Values)
+                long sum = 0;
+                foreach (Jetons jetons in SET.Values)
                 {
-                    foreach(Jeton jeton in staple)
+                    foreach (Jeton jeton in jetons)
                     {
-                        sum += jeton.VAL;
+                        sum += jeton.VALUE;
                     } // loop
                 } // loop
                 return sum;
@@ -167,13 +211,98 @@ namespace WildCards
         /// </summary>
         public class Bank
         {
+            private long _account = 0;
+
+            private Set _safe = null;
+            protected Set SAFE { get { return _safe; } private set { _safe = value; } }
+
             public Bank()
             {
-
+                SAFE = new Set();
+                generate(SAFE, 10000);
             } // method
-        
-            
-        
+
+            private Jeton produce(string tag)
+            {
+                Jeton jeton = null;
+                switch (tag)
+                {
+                    case Tags.cnst_One:
+                        jeton = new JetonOne(); // fresh from the press a 1
+                        break;
+                    case Tags.cnst_Five:
+                        jeton = new JetonFive(); // fresh from the press a 5
+                        break;
+                    case Tags.cnst_Ten:
+                        jeton = new JetonFraud(); // TODO produce JetonTen object here
+                        break;
+                    case Tags.cnst_Fifty:
+                        jeton = new JetonFraud(); // TODO produce JetonFifty object here
+                        break;
+                    case Tags.cnst_Hundred:
+                        jeton = new JetonFraud(); // TODO produce JetonHundred object here
+                        break;
+                    case Tags.cnst_Thousand:
+                        jeton = new JetonFraud(); // TODO produce JetonThousand object here
+                        break;
+                    default:
+                        throw new NotValid($"{GetType()} - given tag: {tag} is not valid for producing a Jeton object");
+                } // switch
+                return jeton;
+            } // method
+
+            private void generate(Set safe, int sum)
+            {
+                foreach (string tag in SAFE.SET.Keys)
+                {
+                    Jetons jetons = SAFE.SET[tag];
+                    for( int j = 0; j < sum; j++)
+                    {
+                        Jeton jeton = produce(tag);
+                        jetons.Add(jeton);
+                    } // loop
+                } // loop
+            } // method
+
+            public bool hasIntegrity()
+            {
+                bool hasIntegrity = true;
+                HashSet<string> uuids = new HashSet<string>();
+                foreach(string tag in SAFE.SET.Keys)
+                {
+                    foreach(Jeton jeton in SAFE.SET[tag])
+                    {
+                        string uuid = jeton.UUID;
+                        if (uuids.Contains(uuid)) {
+                            hasIntegrity = false;
+#if DEBUG                        
+                            System.Console.WriteLine($"{GetType()} - found doubled UUID: {uuid}");
+#endif               
+                        } else
+                        {
+                            uuids.Add(uuid);
+                        } // if
+                    } // loop
+                } // loop
+                return hasIntegrity;
+            } // method
+
+            public long sumUp() { return SAFE.sumUp(); }
+
+            public Jetons change(int dollar)
+            {
+                Jetons jetons = new Jetons();
+                // TODO implement the exchange of jetons by given amount of dollars
+                return jetons;
+            } // method
+
+            public int change(Jetons jetons)
+            {
+                int dollar = 0;
+                // TODO implement the exchange of dollar by given amount of jeton
+                return dollar;
+            } // method
+
         } // class
 
     } // namespace

@@ -21,6 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
@@ -79,7 +80,63 @@ namespace WildCards
         /// <returns>a quasi UUID of version 5</returns>
         public static string genUUID()
         {
-            return computeHash(genRandom().ToString());
+            return Guid.NewGuid().ToString();
+        } // method
+
+        public static Dictionary<string, int> explode_handed(int number)
+        {
+            Dictionary<string, int> set = new Dictionary<string, int>();
+
+            int rest1000 = number % 1000; // 9999 => 999
+            int thousendTimes = (number - rest1000) / 1000;
+            set.Add(Tags.Thousand, thousendTimes);
+            number = rest1000;
+
+            int rest100 = number % 100; // 999 => 99
+            int hundredTimes = (number - rest100) / 100;
+            set.Add(Tags.Hundred, hundredTimes);
+            number = rest100;
+
+            int rest50 = number % 50; // 99 => 49
+            int fiftyTimes = (number - rest50) / 50;
+            set.Add(Tags.Fifty, fiftyTimes);
+            number = rest50;
+
+            int rest10 = number % 10; // 49 => 9
+            int tenTimes = (number - rest10) / 10;
+            set.Add(Tags.Ten, tenTimes);
+            number = rest10;
+
+            int rest5 = number % 5; // 9 => 4
+            int fiveTimes = (number - rest5) / 5;
+            set.Add(Tags.Five, fiveTimes);
+            number = rest5;
+
+            int rest1 = number; // 4 => 4
+            int oneTimes = rest1;
+            set.Add(Tags.One, oneTimes);
+            number = number - rest1; // 0
+
+            return set;
+        } // method
+
+        public static Dictionary<string, int> explode(int number)
+        {
+            string[] arr = { Tags.Thousand, Tags.Hundred, Tags.Fifty, Tags.Ten, Tags.Five, Tags.One };
+            int steps = arr.Length;
+            Dictionary<string, int> set = new Dictionary<string, int>();
+            int step = 0;
+            while (step < steps && number != 0)
+            {
+                string tag = arr[step];
+                int divider = Tags.value(tag);
+                int rest = number % divider;
+                int times = (number - rest) / divider;
+                set.Add(tag, times);
+                number = rest;
+                step++;
+            } // loop
+            return set;
         } // method
 
     } // class
