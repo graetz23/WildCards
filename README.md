@@ -13,7 +13,7 @@ For the implementation of the simulator, different design pattens are applied by
 The project supplies oneself as a *look-up* or a *how-to do it* in C# summary.
 
 ## Development
-Mono and MonoDevelop by debian GNU/Linux is and was used for implementation.
+Mono and MonoDevelop by debian GNU/Linux is and was used in first steps for implementation. In 2023 the project had been switched to _dotnet_ (former .NET core).
 
 ## Remarks
 I used this project in 2018 to get from C++ into C# and also into mono and MonoDevelop.
@@ -22,6 +22,10 @@ I used this project in 2018 to get from C++ into C# and also into mono and MonoD
 Christian (graetz23@gmail.com).
 
 ## Changelog
+
+### 20230516
+Switching project to dotnet (.NET core)
+
 ### 20221105
 Updating copyright and refactoring project.
 
