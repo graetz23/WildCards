@@ -32,9 +32,10 @@ namespace WildCards
   using Cards.Values;
   using Behaviours = List<Cards.Shuffling.Behaviour>;
 
-  class MainClass
+  class Program
   {
-    public static void Main (string[] args)
+
+    static void Main (string[] args)
     {
       try {        
         Console.WriteLine ("WildCards ..");
