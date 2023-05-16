@@ -20,62 +20,83 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
 
 namespace WildCards
 {
-  /// <summary>
-  /// Players ot Dealers (Croupies).
-  /// </summary>
-  namespace Players
-  {
-    using Cards;
-    using Tables;
-    using Dealers;
-    using Exceptions;
-
-    public class Player
+    /// <summary>
+    /// Players ot Dealers (Croupies).
+    /// </summary>
+    namespace Persons
     {
-      protected string _excHead = "Player.";
+        using Cards;
+        using Rules;
+        using Tables;
+        using Currency;
+        using Exceptions;
+        using System.Collections.Generic;
 
-      protected Stack _hand = null;
+        public class Player
+        {
+            protected StateMachine _stateMachine = null;
 
-      protected Table _table = null;
+            protected Set _staple = null; // for Jeton objects
 
-      public Player (int maxNoOfCards)
-      {
-        string excMsg = _excHead + "Player - ";
-        if (maxNoOfCards < 1)
-          throw new NotValid (excMsg + "given maximum number of Cards is smaller than 1!");
-        _hand = new Stack (maxNoOfCards);
-      } // method
+            protected Stack _hand = null; // for Card objects
 
-      /// <summary>
-      /// Pop Card instance.
-      /// </summary>
-      public Card pop() {
-        return _hand.pop ();
-      } // method
+            protected Table _table = null; // for commanding StateMachine and playing Cards
 
-      /// <summary>
-      /// Push the specified card to hand.
-      /// </summary>
-      /// <param name="card">Card.</param>
-      public void push( Card card ) {
-        _hand.push (card);
-      } // method
+            public Player(int maxNoOfCards)
+            {
+                _staple = new Set();
+                if (maxNoOfCards < 1)
+                    throw new NotValid(GetType() + " - given maximum number of Cards is smaller than 1!");
+                _hand = new Stack(maxNoOfCards);
+            } // method
 
-      /// <summary>
-      /// Register the specified table.
-      /// </summary>
-      /// <param name="table">Table.</param>
-      public void register( Table table ) {
-        string excMsg = _excHead + "register - ";
-        if (table == null)
-          throw new NotExistent (excMsg + "given dealer is null!");
-        _table = table;
-      } // method
+            public void next()
+            {
+                _stateMachine.next();
+            } // method
 
-    } // class
-  } // namespace
+            /// <summary>
+            /// Pop Card instance.
+            /// </summary>
+            public Card pop()
+            {
+                return _hand.pop();
+            } // method
+
+            /// <summary>
+            /// Push the specified card to hand.
+            /// </summary>
+            /// <param name="card">Card.</param>
+            public void push(Card card)
+            {
+                _hand.push(card);
+            } // method
+
+            /// <summary>
+            /// Register the specified table.
+            /// </summary>
+            /// <param name="table">Table.</param>
+            public void register(Table table)
+            {
+                if (table == null)
+                    throw new NotExistent(GetType() + " - given dealer is null!");
+                _table = table;
+            } // method
+
+        } // class
+
+        public class TexasHoldEmPlayer : Player
+        {
+
+            public TexasHoldEmPlayer(int maxNoOfCards) : base(maxNoOfCards)
+            {
+                _stateMachine = new Rules.TexasHoldEm.Poker();
+            } // method
+
+        } // class
+
+    } // namespace
 } // namespace

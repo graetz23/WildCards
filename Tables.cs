@@ -20,72 +20,154 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-using System;
 using System.Collections.Generic;
 
 namespace WildCards
 {
-  namespace Tables
-  {
-
-    using Cards;
-    using Dealers;
-    using Players;
-    using Exceptions;
-
-    /// <summary>
-    /// Takes Cards, registers Players register can see.
-    /// </summary>
-    public class Table
+    namespace Tables
     {
-      protected string _excHead = "Table.";
+        using Cards;
+        using Rules;
+        using Persons;
+        using Exceptions;
+        using Players = List<Persons.Player>;
+        using Stacks = Dictionary<Persons.Player, Cards.Stack>;
 
-      /// <summary>
-      /// The Dealer of this table.
-      /// </summary>
-      protected Dealer _dealer = null;
+        /// <summary>
+        /// Takes Cards, registers Players, register a Dealer, and can see.
+        /// </summary>
+        public class Table
+        {
+            protected StateMachine _stateMachine = null;
 
-      protected List<Player> _players = null;
+            /// <summary>
+            /// The Dealer of this table.
+            /// </summary>
+            protected Dealer _dealer = null;
 
-      protected int _maxNoOfCards = -1;
+            /// <summary>
+            /// The registered player of this table
+            /// </summary>
+            protected Players _players = null;
 
-      protected Stack _stack = null;
+            protected Stack _foldStack = null;
 
-      public Table ( int maxNoOfCards )
-      {
-        string excMsg = _excHead + "Table - ";
-        if (maxNoOfCards < 1)
-          throw new NotValid (excMsg + "given maximum number of Cards is smaller than 1!");
-        _maxNoOfCards = maxNoOfCards;
-        _stack = new Stack (_maxNoOfCards);
-        _players = new List<Player>( );
-      } // method
+            protected Stack _placeStack = null;
 
-      /// <summary>
-      /// Register the specified dealer.
-      /// </summary>
-      /// <param name="dealer">Dealer.</param>
-      void register( Dealer dealer ) {
-        string excMsg = _excHead + "register - ";
-        if (dealer == null)
-          throw new NotExistent (excMsg + "given dealer is null!");
-        _dealer = dealer;
-        dealer.register (this);
-      } // method
+            public Table()
+            {
+            } // method
 
-      /// <summary>
-      /// Register the specified player.
-      /// </summary>
-      /// <param name="player">Player.</param>
-      void register( Player player ) {
-        string excMsg = _excHead + "register - ";
-        if (player == null)
-          throw new NotExistent (excMsg + "given dealer is null!");
-        _players.Add ( player );
-        player.register (this);
-      } // method
+            public Table(Dealer dealer, Players players)
+            {
+                register(dealer);
+                foreach (Player player in players)
+                    register(player);
+            } // method
 
-    } // class
+            /// <summary>
+            /// Register the specified dealer.
+            /// </summary>
+            /// <param name="dealer">The Dealer object of this Table object.</param>
+            protected virtual void register(Dealer dealer)
+            {
+                if (dealer == null)
+                    throw new NotExistent(GetType() + " - given dealer is null");
+                _dealer = dealer;
+                dealer.register(this);
+            } // method
 
-  } // namespace
+            /// <summary>
+            /// Register the specified player.
+            /// </summary>
+            /// <param name="player">Another Player object of this Table object.</param>
+            protected virtual void register(Player player)
+            {
+                if (player == null)
+                    throw new NotExistent(GetType() + " - given dealer is null");
+                if (_players == null)
+                    _players = new Players();
+                _players.Add(player);
+                player.register(this);
+            } // method
+
+            public void next()
+            {
+                _stateMachine.next();
+                _dealer.next();
+                foreach(Player player in _players)
+                {
+                    player.next();
+                } // loop
+            } // method
+
+            protected virtual void fold( Card card )
+            {
+                _foldStack.add(card);
+            } // method
+
+            protected virtual void place(Card card)
+            {
+                _placeStack.add(card);
+            } // method
+
+        } // class
+
+        public class TexasHoldEmTable : Table
+        {
+            protected const int _maxFolded = 2;
+            protected const int _maxPlaced = 5;
+
+            public TexasHoldEmTable(Dealer dealer, Players players) : base(dealer, players)
+            {
+                _stateMachine = new Rules.TexasHoldEm.Poker();
+
+                // max 2 cards folded by 1 card after the Flop + 1 after the River
+                _foldStack = new Stack(_maxFolded); // only two can be folded on to the Table object by a texas hold em dealer
+                
+                // max 5 cards placed by 3 cards as the Flop + 1 as the River + 1 as the Turn
+                _placeStack = new Stack(_maxPlaced); // only five can be placed on the Table object by a texas hold em dealer
+            } // method
+
+            /// <summary>
+            /// Register a teaxs hold em poker dealer.
+            /// </summary>
+            /// <param name="dealer">The Dealer object of this Table object.</param>
+            protected override void register(Dealer dealer)
+            {
+                base.register(dealer);
+                if (!(dealer is TexasHoldEmDealer))
+                    throw new NotValid(GetType() + " - given is not a texas hold em dealer");
+            } // method
+
+            /// <summary>
+            /// Register the a texas hold em player.
+            /// </summary>
+            /// <param name="player">Another Player object of this Table object.</param>
+            protected override void register(Player player)
+            {
+                base.register(player);
+                if (!(player is TexasHoldEmPlayer))
+                    throw new NotExistent(GetType() + " - given is not a texas hold em player");
+            } // method
+
+            protected override void fold(Card card)
+            {
+                if (_foldStack.Count > _maxFolded)
+                    throw new NotPossible($"{GetType()} - more than {_maxFolded} are folded on the Table by the Dealer");
+                base.fold(card); // call method in super class
+            } // method
+
+            protected override void place(Card card)
+            {
+                if (_placeStack.Count > _maxFolded)
+                    throw new NotPossible($"{GetType()} - more than {_maxPlaced} are folded on the Table by the Dealer");
+                base.place(card); // call method in super class
+            } // method
+
+
+
+        } // class
+
+    } // namespace
 } // namespace

@@ -31,71 +31,80 @@ namespace WildCards
   using Cards.French;
   using Cards.Values;
   using Behaviours = List<Cards.Shuffling.Behaviour>;
+  using WildCards.Currency;
 
   class Program
-  {
-
-    static void Main (string[] args)
     {
-      try {        
-        Console.WriteLine ("WildCards ..");
-        Console.WriteLine();
+        static void Main(string[] args)
+        {
+            try
+            {
+                Console.WriteLine("WildCards ..");
+                Console.WriteLine();
 
-        Deck deck = DeckFactory.buildFrench52();
-        Stack stack = deck.Stack;
+                Deck deck = DeckFactory.buildFrench52();
+                Stack stack = deck.Stack;
 
-        Console.WriteLine("Fresh deck:");
-        Console.WriteLine();
-        foreach( Card card in stack ) {
-          Console.Write( card.ID + " " );
-//          Console.Write( card.Color + " " );
-//          Console.Write( card.Value + " " );
-//          Console.Write( card.XML );
-          //          Console.WriteLine();
-        } // loop
-        Console.WriteLine();
+                Console.WriteLine("Fresh deck:");
+                Console.WriteLine();
+                foreach (Card card in stack)
+                {
+                    Console.Write(card.ID + " ");
+                } // loop
+                Console.WriteLine();
 
-        Console.WriteLine();
-        Console.WriteLine("Shuffled deck:");
-        Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine("Shuffled deck:");
+                Console.WriteLine();
 
-        Shuffler shuffler = new Shuffler ();
-        Behaviours behaviours = Cards.Shuffling.Factory.buildRandomly( );
-        foreach( Cards.Shuffling.Behaviour behaviour in behaviours ) {
-          shuffler.add (behaviour);
-        } // loop
-        stack = shuffler.shuffle( stack );
+                Shuffler shuffler = ShufflerFactory.buildHandwise();
+                shuffler.shuffle(stack).shuffle(stack).shuffle(stack);
 
-        foreach( Card card in stack ) {
-          Console.Write( card.ID + " " );
-//          Console.Write( card.Color + " " );
-//          Console.Write( card.Value + " " );
-//          Console.Write( card.XML );
-//          Console.WriteLine();
-        } // loop
-        Console.WriteLine();
+                foreach (Card card in stack)
+                {
+                    Console.Write(card.ID + " ");
+                } // loop
+                Console.WriteLine();
 
-        Console.WriteLine();
-        Console.WriteLine("Sorted deck:");
-        Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine("Sorted deck:");
+                Console.WriteLine();
 
-        stack.sort();
+                stack.sort();
 
-        foreach( Card card in stack ) {
-          Console.Write( card.ID + " " );
-//          Console.Write( card.Color + " " );
-//          Console.Write( card.Value + " " );
-//          Console.Write( card.XML );
-//          Console.WriteLine();
-        } // loop
-        Console.WriteLine();
+                foreach (Card card in stack)
+                {
+                    Console.Write(card.ID + " ");
+                } // loop
+                Console.WriteLine();
 
-        Console.WriteLine();
-      } catch(Exception e) {
-        Console.WriteLine();
-        Console.WriteLine (e.StackTrace);
-        Console.WriteLine (e.Message);
-      } // try
-    } // method
-  } // class
+                Console.WriteLine();
+
+                Console.WriteLine();
+                Console.WriteLine("Jetons:");
+                Console.WriteLine();
+
+                Currency.Bank bank = new Currency.Bank();
+                Console.WriteLine($"The bank keeps: {bank.sumUp()}");
+                bank.hasIntegrity();
+                Console.WriteLine();
+
+                List<Currency.Jeton> jetons = bank.change(9999);
+                bool areRegisterd = bank.registered(jetons);
+                int dollar = bank.change(jetons);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine();
+                Console.WriteLine(e.StackTrace);
+                Console.WriteLine(e.Message);
+            } // try
+
+#if DEBUG
+            Console.WriteLine($"<press any key to exit>");
+            Console.ReadKey();
+#endif
+
+        } // method
+    } // class
 } // namespace
