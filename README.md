@@ -9,18 +9,24 @@ The simulator should play some playing card games, e.g. like Texas hold'em poker
 For the implementation of the simulator, different software design pattens are applied. Those are adapted towards C# and vary e.g. from Factory, Facade, Decorator, Prototype, Strategy, to the Observer pattern.
 
 ### Philosophy
-The project supplies oneself as a *look-up* or a *how-to do it* in C# summary.
+The project supplies oneself as a *try-out* object-oriented code and also as a *look-up* or a *how-to do it* in C# summary for myself.
 
 ## Development
 Mono and MonoDevelop by debian GNU/Linux is and was used in first steps for implementation. In 2023 the project had been switched to _dotnet_ (former .NET core).
 
+## Usage
+Take a _bash_, clone the repo, and: _dotnet build_ && _dotnet run_
+
 ## Remarks
-I used this project in 2018 to get from C++ into C# and also into mono and MonoDevelop.
+**I used this project in 2018 to get from C++ and Java into microsoft's C# and also into mono and MonoDevelop. Nowadays I use it to try _dotnet core framework_ project and solution management using the console or bash, respectively.**
 
 ## Contact
 Christian (graetz23@gmail.com).
 
 ## Changelog
+
+### 20240503
+Updating towards dotnet core framework and how to use it.
 
 ### 20230516
 Switching project to dotnet (.NET core)
